@@ -49,10 +49,11 @@ const App = () => {
 		<div className='App'>
 			<InputWithLabel
 				id='search'
-				label='Search'
 				value={searchTerm}
-				onInputChange={handleSearch}
-			/>
+				isFocused
+				onInputChange={handleSearch}>
+				<strong>Search:</strong>
+			</InputWithLabel>
 			<List list={searchedStories} />
 		</div>
 	)
