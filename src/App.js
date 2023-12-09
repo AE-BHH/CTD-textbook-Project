@@ -1,26 +1,7 @@
-import React, { useEffect, useReducer, useState } from 'react'
+import React, { useCallback, useEffect, useReducer, useState } from 'react'
 import './App.css'
 import List from './List'
 import InputWithLabel from './InputWithLabel'
-
-// const initialStories = [
-// 	{
-// 		title: 'React',
-// 		url: 'https://reactjs.org/',
-// 		author: 'Jordan Walke',
-// 		num_comments: 3,
-// 		points: 4,
-// 		objectID: 0,
-// 	},
-// 	{
-// 		title: 'Redux',
-// 		url: 'https://redux.js.org/',
-// 		author: 'Dan Abramov, Andrew Clark',
-// 		num_comments: 2,
-// 		points: 5,
-// 		objectID: 1,
-// 	},
-// ]
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query='
 
@@ -77,7 +58,7 @@ const App = () => {
 		isError: false,
 	})
 
-	useEffect(() => {
+	const handleFetchStories = useCallback(() => {
 		if (!searchTerm) return
 		dispatchStories({ type: 'STORIES_FETCH_INIT' })
 
@@ -92,6 +73,10 @@ const App = () => {
 			})
 			.catch(() => dispatchStories({ type: 'STORIES_FETCH_FAILURE' }))
 	}, [searchTerm])
+
+	useEffect(() => {
+		handleFetchStories()
+	}, [handleFetchStories])
 
 	const handleRemoveStory = (item) => {
 		stories.data.filter((story) => item.objectID !== story.objectID)
