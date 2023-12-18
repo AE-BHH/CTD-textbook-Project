@@ -50,6 +50,7 @@ function storiesReducer(state, action) {
 
 const App = () => {
 	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React')
+	const [url, setUrl] = useState(`{API_ENDPOINT}${searchTerm}`)
 
 	//useReducer: The new hook receives a reducer function and an initial state as arguments and returns an array with two items. The first item is the current state; the second item is the state updater function (also called dispatch function).
 	const [stories, dispatchStories] = useReducer(storiesReducer, {
@@ -57,12 +58,19 @@ const App = () => {
 		isLoading: false,
 		isError: false,
 	})
+	const handleSearchInput = (event) => {
+		setSearchTerm(event.target.value)
+	}
+
+	const handleSearchSubmit = () => {
+		setUrl(`${API_ENDPOINT}${searchTerm}`)
+	}
 
 	const handleFetchStories = useCallback(() => {
 		if (!searchTerm) return
 		dispatchStories({ type: 'STORIES_FETCH_INIT' })
 
-		fetch(`${API_ENDPOINT}${searchTerm}`)
+		fetch(url)
 			.then((response) => response.json())
 			.then((result) => {
 				console.log(result)
@@ -72,7 +80,7 @@ const App = () => {
 				})
 			})
 			.catch(() => dispatchStories({ type: 'STORIES_FETCH_FAILURE' }))
-	}, [searchTerm])
+	}, [searchTerm, url])
 
 	useEffect(() => {
 		handleFetchStories()
@@ -87,19 +95,18 @@ const App = () => {
 		})
 	}
 
-	const handleSearch = (event) => {
-		setSearchTerm(event.target.value)
-	}
-
 	return (
 		<div className='App'>
 			<InputWithLabel
 				id='search'
 				value={searchTerm}
 				isFocused
-				onInputChange={handleSearch}>
+				onInputChange={handleSearchInput}>
 				<strong>Search:</strong>
 			</InputWithLabel>
+			<button type='button' disabled={!searchTerm} onClick={handleSearchSubmit}>
+				Submit
+			</button>
 			{stories.isError && <p>Something went wrong...</p>}
 			{stories.isLoading ? (
 				<p>Loading...</p>
