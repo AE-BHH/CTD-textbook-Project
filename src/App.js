@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useReducer, useState } from 'react'
 import axios from 'axios'
 import './App.css'
 import List from './List'
-import InputWithLabel from './InputWithLabel'
+import SearchForm from './SearchForm'
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query='
 
@@ -53,7 +53,6 @@ const App = () => {
 	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React')
 	const [url, setUrl] = useState(`{API_ENDPOINT}${searchTerm}`)
 
-	//useReducer: The new hook receives a reducer function and an initial state as arguments and returns an array with two items. The first item is the current state; the second item is the state updater function (also called dispatch function).
 	const [stories, dispatchStories] = useReducer(storiesReducer, {
 		data: [],
 		isLoading: false,
@@ -63,8 +62,9 @@ const App = () => {
 		setSearchTerm(event.target.value)
 	}
 
-	const handleSearchSubmit = () => {
+	const handleSearchSubmit = (event) => {
 		setUrl(`${API_ENDPOINT}${searchTerm}`)
+		event.preventDefault()
 	}
 
 	const handleFetchStories = useCallback(async () => {
@@ -98,16 +98,12 @@ const App = () => {
 
 	return (
 		<div className='App'>
-			<InputWithLabel
-				id='search'
-				value={searchTerm}
-				isFocused
-				onInputChange={handleSearchInput}>
-				<strong>Search:</strong>
-			</InputWithLabel>
-			<button type='button' disabled={!searchTerm} onClick={handleSearchSubmit}>
-				Submit
-			</button>
+			<SearchForm
+				searchTerm={searchTerm}
+				onSearchInput={handleSearchInput}
+				onSearchSubmit={handleSearchSubmit}
+			/>
+
 			{stories.isError && <p>Something went wrong...</p>}
 			{stories.isLoading ? (
 				<p>Loading...</p>
